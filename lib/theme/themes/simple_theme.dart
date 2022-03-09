@@ -15,22 +15,22 @@ class SimpleTheme extends PuzzleTheme {
   String get name => 'Simple';
 
   @override
-  bool get hasTimer => false;
+  bool get hasTimer => true;
 
   @override
-  bool get hasCountdown => false;
+  bool get hasCountdown => true;
 
   @override
   Color get backgroundColor => PuzzleColors.white;
 
   @override
-  Color get defaultColor => PuzzleColors.primary5;
+  Color get defaultColor => PuzzleColors.black;
 
   @override
-  Color get hoverColor => PuzzleColors.primary3;
+  Color get hoverColor => PuzzleColors.blackHover;
 
   @override
-  Color get pressedColor => PuzzleColors.primary7;
+  Color get pressedColor => PuzzleColors.blackPressed;
 
   @override
   PuzzleLayoutDelegate get layoutDelegate => const SimplePuzzleLayoutDelegate();

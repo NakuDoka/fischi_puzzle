@@ -37,39 +37,21 @@ class NumberOfMovesAndTilesLeft extends StatelessWidget {
     return ResponsiveLayoutBuilder(
       small: (context, child) => Center(child: child),
       medium: (context, child) => Center(child: child),
-      large: (context, child) => child!,
+      large: (context, child) => Center(child: child),
       child: (currentSize) {
-        final bodyTextStyle = currentSize == ResponsiveLayoutSize.small
-            ? PuzzleTextStyle.bodySmall
-            : PuzzleTextStyle.body;
+        final bodyTextStyle =
+            currentSize == ResponsiveLayoutSize.small ? PuzzleTextStyle.buttonText2 : PuzzleTextStyle.buttonText2;
 
         return RichText(
           key: const Key('numberOfMovesAndTilesLeft'),
           textAlign: TextAlign.center,
           text: TextSpan(
             text: numberOfMoves.toString(),
-            style: PuzzleTextStyle.headline4.copyWith(
-              color: textColor,
-            ),
+            style: PuzzleTextStyle.bodyTextBold,
             children: [
-              TextSpan(
-                text: ' ${l10n.puzzleNumberOfMoves} | ',
-                style: bodyTextStyle.copyWith(
-                  color: textColor,
-                ),
-              ),
-              TextSpan(
-                text: numberOfTilesLeft.toString(),
-                style: PuzzleTextStyle.headline4.copyWith(
-                  color: textColor,
-                ),
-              ),
-              TextSpan(
-                text: ' ${l10n.puzzleNumberOfTilesLeft}',
-                style: bodyTextStyle.copyWith(
-                  color: textColor,
-                ),
-              ),
+              TextSpan(text: ' ${l10n.puzzleNumberOfMoves} | ', style: PuzzleTextStyle.bodyText),
+              TextSpan(text: numberOfTilesLeft.toString(), style: PuzzleTextStyle.bodyTextBold),
+              TextSpan(text: ' ${l10n.puzzleNumberOfTilesLeft}', style: PuzzleTextStyle.bodyText),
             ],
           ),
         );

@@ -28,7 +28,7 @@ abstract class PuzzleLayoutDelegate extends Equatable {
   /// on a desktop.
   /// - the bottom side of the puzzle UI (below the puzzle board)
   /// on a tablet/mobile.
-  Widget endSectionBuilder(PuzzleState state);
+  Widget endSectionBuilder(PuzzleState state, String mode);
 
   /// A widget builder for the background of the puzzle based on
   /// the puzzle [state].
@@ -48,7 +48,7 @@ abstract class PuzzleLayoutDelegate extends Equatable {
   ///
   /// To complete the puzzle, all tiles must be arranged
   /// in order by their [Tile.value].
-  Widget tileBuilder(Tile tile, PuzzleState state);
+  Widget tileBuilder(Tile tile, PuzzleState state, bool isImage, int tiles);
 
   /// A widget builder for the whitespace puzzle tile.
   Widget whitespaceTileBuilder();

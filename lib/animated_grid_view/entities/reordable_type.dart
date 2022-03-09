@@ -1,0 +1,1 @@
+enum ReorderableType { gridViewCount, AnimatedGridViewCount }

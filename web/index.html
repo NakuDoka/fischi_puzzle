@@ -38,7 +38,27 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCo2G3Jl8uRgC8x5X2OpyC_MQJfp4M0pY",
+      authDomain: "fischi-puzzle.firebaseapp.com",
+      projectId: "fischi-puzzle",
+      storageBucket: "fischi-puzzle.appspot.com",
+      messagingSenderId: "639154038312",
+      appId: "1:639154038312:web:a8f31333648e0ef3bcf71d"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
   <script>
+    
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
     function loadMainDartJs() {

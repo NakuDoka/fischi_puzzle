@@ -20,12 +20,7 @@ class PuzzleName extends StatelessWidget {
     return ResponsiveLayoutBuilder(
       small: (context, child) => const SizedBox(),
       medium: (context, child) => const SizedBox(),
-      large: (context, child) => Text(
-        name,
-        style: PuzzleTextStyle.headline5.copyWith(
-          color: PuzzleColors.grey1,
-        ),
-      ),
+      large: (context, child) => const SizedBox(),
     );
   }
 }

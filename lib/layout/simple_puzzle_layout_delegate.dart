@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
+
+import 'package:provider/provider.dart';
+import 'package:very_good_slide_puzzle/animated_grid_view/widgets/reorderable_grid_view.dart';
+import 'package:very_good_slide_puzzle/app/view/leaderboards.dart';
 import 'package:very_good_slide_puzzle/colors/colors.dart';
 import 'package:very_good_slide_puzzle/l10n/l10n.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
 import 'package:very_good_slide_puzzle/models/models.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
+import 'package:very_good_slide_puzzle/services/db.dart';
 import 'package:very_good_slide_puzzle/theme/theme.dart';
 import 'package:very_good_slide_puzzle/typography/typography.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 /// {@template simple_puzzle_layout_delegate}
 /// A delegate for computing the layout of the puzzle UI
@@ -22,30 +27,45 @@ class SimplePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
     return ResponsiveLayoutBuilder(
       small: (_, child) => child!,
       medium: (_, child) => child!,
-      large: (_, child) => Padding(
-        padding: const EdgeInsets.only(left: 50, right: 32),
-        child: child,
-      ),
+      large: (_, child) => child!,
       child: (_) => SimpleStartSection(state: state),
     );
   }
 
   @override
-  Widget endSectionBuilder(PuzzleState state) {
+  Widget endSectionBuilder(PuzzleState state, String mode) {
     return Column(
       children: [
         const ResponsiveGap(
           small: 32,
           medium: 48,
+          large: 48,
         ),
-        ResponsiveLayoutBuilder(
-          small: (_, child) => const SimplePuzzleShuffleButton(),
-          medium: (_, child) => const SimplePuzzleShuffleButton(),
-          large: (_, __) => const SizedBox(),
-        ),
+        // ignore: prefer_if_elements_to_conditional_expressions
+        state.puzzleStatus != PuzzleStatus.complete
+            ? ResponsiveLayoutBuilder(
+                small: (_, child) => const SimplePuzzleShuffleButton(),
+                medium: (_, child) => const SimplePuzzleShuffleButton(),
+                large: (_, __) => const SimplePuzzleShuffleButton(),
+              )
+            : ResponsiveLayoutBuilder(
+                small: (_, child) => SimplePuzzleShuffleButtonColumn(
+                  mode: mode,
+                  state: state,
+                ),
+                medium: (_, child) => SimplePuzzleShuffleButtonColumn(
+                  mode: mode,
+                  state: state,
+                ),
+                large: (_, __) => SimplePuzzleShuffleButtonColumn(
+                  mode: mode,
+                  state: state,
+                ),
+              ),
         const ResponsiveGap(
           small: 32,
           medium: 48,
+          large: 48,
         ),
       ],
     );
@@ -53,39 +73,7 @@ class SimplePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
 
   @override
   Widget backgroundBuilder(PuzzleState state) {
-    return Positioned(
-      right: 0,
-      bottom: 0,
-      child: ResponsiveLayoutBuilder(
-        small: (_, __) => SizedBox(
-          width: 184,
-          height: 118,
-          child: Image.asset(
-            'assets/images/simple_dash_small.png',
-            key: const Key('simple_puzzle_dash_small'),
-          ),
-        ),
-        medium: (_, __) => SizedBox(
-          width: 380.44,
-          height: 214,
-          child: Image.asset(
-            'assets/images/simple_dash_medium.png',
-            key: const Key('simple_puzzle_dash_medium'),
-          ),
-        ),
-        large: (_, __) => Padding(
-          padding: const EdgeInsets.only(bottom: 53),
-          child: SizedBox(
-            width: 568.99,
-            height: 320,
-            child: Image.asset(
-              'assets/images/simple_dash_large.png',
-              key: const Key('simple_puzzle_dash_large'),
-            ),
-          ),
-        ),
-      ),
-    );
+    return SizedBox();
   }
 
   @override
@@ -95,7 +83,7 @@ class SimplePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
         const ResponsiveGap(
           small: 32,
           medium: 48,
-          large: 96,
+          large: 48,
         ),
         ResponsiveLayoutBuilder(
           small: (_, __) => SizedBox.square(
@@ -116,7 +104,7 @@ class SimplePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
             ),
           ),
           large: (_, __) => SizedBox.square(
-            dimension: _BoardSize.large,
+            dimension: _BoardSize.medium,
             child: SimplePuzzleBoard(
               key: const Key('simple_puzzle_board_large'),
               size: size,
@@ -124,35 +112,56 @@ class SimplePuzzleLayoutDelegate extends PuzzleLayoutDelegate {
             ),
           ),
         ),
-        const ResponsiveGap(
-          large: 96,
-        ),
       ],
     );
   }
 
   @override
-  Widget tileBuilder(Tile tile, PuzzleState state) {
-    return ResponsiveLayoutBuilder(
-      small: (_, __) => SimplePuzzleTile(
-        key: Key('simple_puzzle_tile_${tile.value}_small'),
-        tile: tile,
-        tileFontSize: _TileFontSize.small,
-        state: state,
-      ),
-      medium: (_, __) => SimplePuzzleTile(
-        key: Key('simple_puzzle_tile_${tile.value}_medium'),
-        tile: tile,
-        tileFontSize: _TileFontSize.medium,
-        state: state,
-      ),
-      large: (_, __) => SimplePuzzleTile(
-        key: Key('simple_puzzle_tile_${tile.value}_large'),
-        tile: tile,
-        tileFontSize: _TileFontSize.large,
-        state: state,
-      ),
-    );
+  Widget tileBuilder(Tile tile, PuzzleState state, bool isImage, int tiles) {
+    return isImage
+        ? ResponsiveLayoutBuilder(
+            small: (_, __) => SimplePuzzleTileImg(
+              key: Key('simple_puzzle_tile_${tile.value}_small'),
+              tile: tile,
+              tileFontSize: _TileFontSize.small,
+              state: state,
+              tiles: tiles,
+            ),
+            medium: (_, __) => SimplePuzzleTileImg(
+              key: Key('simple_puzzle_tile_${tile.value}_medium'),
+              tile: tile,
+              tileFontSize: _TileFontSize.medium,
+              state: state,
+              tiles: tiles,
+            ),
+            large: (_, __) => SimplePuzzleTileImg(
+              key: Key('simple_puzzle_tile_${tile.value}_large'),
+              tile: tile,
+              tileFontSize: _TileFontSize.large,
+              state: state,
+              tiles: tiles,
+            ),
+          )
+        : ResponsiveLayoutBuilder(
+            small: (_, __) => SimplePuzzleTile(
+              key: Key('simple_puzzle_tile_${tile.value}_small'),
+              tile: tile,
+              tileFontSize: _TileFontSize.small,
+              state: state,
+            ),
+            medium: (_, __) => SimplePuzzleTile(
+              key: Key('simple_puzzle_tile_${tile.value}_medium'),
+              tile: tile,
+              tileFontSize: _TileFontSize.medium,
+              state: state,
+            ),
+            large: (_, __) => SimplePuzzleTile(
+              key: Key('simple_puzzle_tile_${tile.value}_large'),
+              tile: tile,
+              tileFontSize: _TileFontSize.large,
+              state: state,
+            ),
+          );
   }
 
   @override
@@ -186,27 +195,22 @@ class SimpleStartSection extends StatelessWidget {
         const ResponsiveGap(
           small: 20,
           medium: 83,
-          large: 151,
+          large: 83,
         ),
         const PuzzleName(),
-        const ResponsiveGap(large: 16),
-        SimplePuzzleTitle(
-          status: state.puzzleStatus,
-        ),
         const ResponsiveGap(
           small: 12,
           medium: 16,
-          large: 32,
+          large: 16,
         ),
         NumberOfMovesAndTilesLeft(
           numberOfMoves: state.numberOfMoves,
           numberOfTilesLeft: state.numberOfTilesLeft,
         ),
-        const ResponsiveGap(large: 32),
         ResponsiveLayoutBuilder(
           small: (_, __) => const SizedBox(),
           medium: (_, __) => const SizedBox(),
-          large: (_, __) => const SimplePuzzleShuffleButton(),
+          large: (_, __) => const SizedBox(),
         ),
       ],
     );
@@ -233,9 +237,7 @@ class SimplePuzzleTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PuzzleTitle(
-      title: status == PuzzleStatus.complete
-          ? context.l10n.puzzleCompleted
-          : context.l10n.puzzleChallengeTitle,
+      title: status == PuzzleStatus.complete ? context.l10n.puzzleCompleted : context.l10n.puzzleChallengeTitle,
     );
   }
 }
@@ -271,22 +273,24 @@ class SimplePuzzleBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
+    return ReorderableGridView.count(
+      onReorder: (_, __) {},
       padding: EdgeInsets.zero,
-      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: size,
       mainAxisSpacing: spacing,
       crossAxisSpacing: spacing,
+      enableReorder: false,
+      enableLongPress: false,
       children: tiles,
     );
   }
 }
 
 abstract class _TileFontSize {
-  static double small = 36;
-  static double medium = 50;
-  static double large = 54;
+  static double small = 25;
+  static double medium = 40;
+  static double large = 40;
 }
 
 /// {@template simple_puzzle_tile}
@@ -319,7 +323,7 @@ class SimplePuzzleTile extends StatelessWidget {
     return TextButton(
       style: TextButton.styleFrom(
         primary: PuzzleColors.white,
-        textStyle: PuzzleTextStyle.headline2.copyWith(
+        textStyle: PuzzleTextStyle.tileFontSmall.copyWith(
           fontSize: tileFontSize,
         ),
         shape: const RoundedRectangleBorder(
@@ -341,10 +345,50 @@ class SimplePuzzleTile extends StatelessWidget {
           },
         ),
       ),
-      onPressed: state.puzzleStatus == PuzzleStatus.incomplete
-          ? () => context.read<PuzzleBloc>().add(TileTapped(tile))
-          : null,
+      onPressed:
+          state.puzzleStatus == PuzzleStatus.incomplete ? () => context.read<PuzzleBloc>().add(TileTapped(tile)) : null,
       child: Text(tile.value.toString()),
+    );
+  }
+}
+
+/// {@template simple_puzzle_tile}
+/// Displays the puzzle tile associated with [tile] and
+/// the font size of [tileFontSize] based on the puzzle [state].
+/// {@endtemplate}
+@visibleForTesting
+class SimplePuzzleTileImg extends StatelessWidget {
+  /// {@macro simple_puzzle_tile}
+  const SimplePuzzleTileImg(
+      {Key? key, required this.tile, required this.tileFontSize, required this.state, required this.tiles})
+      : super(key: key);
+
+  /// The tile to be displayed.
+  final Tile tile;
+
+  /// The font size of the tile to be displayed.
+  final double tileFontSize;
+
+  /// The state of the puzzle.
+  final PuzzleState state;
+
+  final int tiles;
+
+  @override
+  Widget build(BuildContext context) {
+    //final theme = context.select((ThemeBloc bloc) => bloc.state.theme);
+    return InkWell(
+      onTap:
+          state.puzzleStatus == PuzzleStatus.incomplete ? () => context.read<PuzzleBloc>().add(TileTapped(tile)) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/folder${tiles - 2}/${tile.value}.png'),
+            fit: BoxFit.fill,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }
@@ -360,19 +404,55 @@ class SimplePuzzleShuffleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PuzzleButton(
-      textColor: PuzzleColors.primary0,
-      backgroundColor: PuzzleColors.primary6,
-      onPressed: () => context.read<PuzzleBloc>().add(const PuzzleReset()),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        isImage: true,
+        textColor: PuzzleColors.white,
+        backgroundColor: PuzzleColors.blue,
+        onPressed: () => context.read<PuzzleBloc>().add(const PuzzleReset()),
+        text: 'Shuffle');
+  }
+}
+
+class SimplePuzzleShuffleButtonColumn extends StatelessWidget {
+  /// {@macro puzzle_shuffle_button}
+  const SimplePuzzleShuffleButtonColumn({Key? key, required this.mode, required this.state}) : super(key: key);
+  final String mode;
+
+  /// The state of the puzzle.
+  final PuzzleState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final db = DatabaseService();
+    final ProgressDialog pr = ProgressDialog(context);
+    return SizedBox(
+      height: 125,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(
-            'assets/images/shuffle_icon.png',
-            width: 17,
-            height: 17,
+          PuzzleButton(
+            textColor: PuzzleColors.white,
+            backgroundColor: PuzzleColors.blue,
+            onPressed: () => context.read<PuzzleBloc>().add(const PuzzleReset()),
+            isImage: false,
+            text: 'Try Again',
           ),
-          const Gap(10),
-          Text(context.l10n.puzzleShuffle),
+          PuzzleButton(
+            textColor: PuzzleColors.white,
+            backgroundColor: PuzzleColors.pink,
+            isImage: false,
+            onPressed: () async {
+              await pr.show();
+              await db.addLeaderboard(mode, state.numberOfMoves);
+              await pr.hide();
+              Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Leaderboards(
+                            mode: mode,
+                          )));
+            },
+            text: 'Leaderboards',
+          ),
         ],
       ),
     );

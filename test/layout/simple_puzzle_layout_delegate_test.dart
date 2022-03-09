@@ -23,8 +23,7 @@ void main() {
 
     setUpAll(() {
       final oldComparator = goldenFileComparator as LocalFileComparator;
-      final newComparator =
-          TolerantComparator(Uri.parse('${oldComparator.basedir}test'));
+      final newComparator = TolerantComparator(Uri.parse('${oldComparator.basedir}test'));
       expect(oldComparator.basedir, newComparator.basedir);
       goldenFileComparator = newComparator;
     });
@@ -376,9 +375,7 @@ void main() {
 
         expect(
           find.byWidgetPredicate(
-            (widget) =>
-                widget is SimplePuzzleTitle &&
-                widget.status == state.puzzleStatus,
+            (widget) => widget is SimplePuzzleTitle && widget.status == state.puzzleStatus,
           ),
           findsOneWidget,
         );
@@ -480,9 +477,9 @@ void main() {
 
       group('matches golden file', () {
         setUp(() {
-          when(() => theme.defaultColor).thenReturn(PuzzleColors.primary5);
-          when(() => theme.hoverColor).thenReturn(PuzzleColors.primary3);
-          when(() => theme.pressedColor).thenReturn(PuzzleColors.primary7);
+          when(() => theme.defaultColor).thenReturn(PuzzleColors.black);
+          when(() => theme.hoverColor).thenReturn(PuzzleColors.blackHover);
+          when(() => theme.pressedColor).thenReturn(PuzzleColors.blackPressed);
         });
 
         testWidgets('given default state', (tester) async {
@@ -529,8 +526,7 @@ void main() {
             themeBloc: themeBloc,
           );
 
-          final gesture =
-              await tester.createGesture(kind: PointerDeviceKind.mouse);
+          final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
           await gesture.addPointer(location: Offset.zero);
           addTearDown(gesture.removePointer);
           await gesture.moveTo(tester.getCenter(find.byType(SimplePuzzleTile)));

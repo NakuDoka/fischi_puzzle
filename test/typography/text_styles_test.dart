@@ -7,24 +7,19 @@ void main() {
 
   group('PuzzleTextStyle', () {
     test('headline styles are defined', () {
-      expect(PuzzleTextStyle.headline1, isA<TextStyle>());
-      expect(PuzzleTextStyle.headline2, isA<TextStyle>());
-      expect(PuzzleTextStyle.headline3, isA<TextStyle>());
-      expect(PuzzleTextStyle.headline3Soft, isA<TextStyle>());
-      expect(PuzzleTextStyle.headline4, isA<TextStyle>());
-      expect(PuzzleTextStyle.headline5, isA<TextStyle>());
+      expect(PuzzleTextStyle.headLine1D, isA<TextStyle>());
+      expect(PuzzleTextStyle.headLine1W, isA<TextStyle>());
+      expect(PuzzleTextStyle.headLine2D, isA<TextStyle>());
+      expect(PuzzleTextStyle.headLine2W, isA<TextStyle>());
     });
 
     test('body styles are defined', () {
-      expect(PuzzleTextStyle.bodyLargeBold, isA<TextStyle>());
-      expect(PuzzleTextStyle.bodyLarge, isA<TextStyle>());
-      expect(PuzzleTextStyle.body, isA<TextStyle>());
-      expect(PuzzleTextStyle.bodySmall, isA<TextStyle>());
-      expect(PuzzleTextStyle.bodyXSmall, isA<TextStyle>());
+      expect(PuzzleTextStyle.bodyText, isA<TextStyle>());
+      expect(PuzzleTextStyle.bodyTextBold, isA<TextStyle>());
     });
 
     test('label style is defined', () {
-      expect(PuzzleTextStyle.label, isA<TextStyle>());
+      expect(PuzzleTextStyle.bodyText, isA<TextStyle>());
     });
   });
 }

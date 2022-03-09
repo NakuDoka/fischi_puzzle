@@ -15,7 +15,10 @@ import '../../helpers/helpers.dart';
 void main() {
   group('PuzzlePage', () {
     testWidgets('renders PuzzleView', (tester) async {
-      await tester.pumpApp(PuzzlePage());
+      await tester.pumpApp(PuzzlePage(
+        tiles: 3,
+        isImage: false,
+      ));
       expect(find.byType(PuzzleView), findsOneWidget);
     });
   });
@@ -31,20 +34,15 @@ void main() {
       theme = MockPuzzleTheme();
       layoutDelegate = MockPuzzleLayoutDelegate();
 
-      when(() => layoutDelegate.startSectionBuilder(any()))
-          .thenReturn(SizedBox());
+      when(() => layoutDelegate.startSectionBuilder(any())).thenReturn(SizedBox());
 
-      when(() => layoutDelegate.endSectionBuilder(any()))
-          .thenReturn(SizedBox());
+      when(() => layoutDelegate.endSectionBuilder(any(), '')).thenReturn(SizedBox());
 
-      when(() => layoutDelegate.backgroundBuilder(any()))
-          .thenReturn(SizedBox());
+      when(() => layoutDelegate.backgroundBuilder(any())).thenReturn(SizedBox());
 
-      when(() => layoutDelegate.boardBuilder(any(), any()))
-          .thenReturn(SizedBox());
+      when(() => layoutDelegate.boardBuilder(any(), any())).thenReturn(SizedBox());
 
-      when(() => layoutDelegate.tileBuilder(any(), any()))
-          .thenReturn(SizedBox());
+      when(() => layoutDelegate.tileBuilder(any(), any(), false, 3)).thenReturn(SizedBox());
 
       when(layoutDelegate.whitespaceTileBuilder).thenReturn(SizedBox());
 
@@ -67,14 +65,16 @@ void main() {
       when(() => theme.backgroundColor).thenReturn(backgroundColor);
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
       expect(
         find.byWidgetPredicate(
-          (widget) =>
-              widget is Scaffold && widget.backgroundColor == backgroundColor,
+          (widget) => widget is Scaffold && widget.backgroundColor == backgroundColor,
         ),
         findsOneWidget,
       );
@@ -86,7 +86,10 @@ void main() {
       tester.setLargeDisplaySize();
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -99,7 +102,10 @@ void main() {
       tester.setMediumDisplaySize();
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -112,7 +118,10 @@ void main() {
       tester.setSmallDisplaySize();
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -121,7 +130,10 @@ void main() {
 
     testWidgets('renders puzzle header', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -130,7 +142,10 @@ void main() {
 
     testWidgets('renders puzzle sections', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -141,7 +156,10 @@ void main() {
         'builds start section '
         'with layoutDelegate.startSectionBuilder', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -152,18 +170,24 @@ void main() {
         'builds end section '
         'with layoutDelegate.endSectionBuilder', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
-      verify(() => layoutDelegate.endSectionBuilder(any())).called(1);
+      verify(() => layoutDelegate.endSectionBuilder(any(), '')).called(1);
     });
 
     testWidgets(
         'builds background '
         'with layoutDelegate.backgroundBuilder', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -174,7 +198,10 @@ void main() {
         'builds board '
         'with layoutDelegate.boardBuilder', (tester) async {
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -186,33 +213,37 @@ void main() {
     testWidgets(
         'builds 15 tiles '
         'with layoutDelegate.tileBuilder', (tester) async {
-      when(() => layoutDelegate.boardBuilder(any(), any()))
-          .thenAnswer((invocation) {
+      when(() => layoutDelegate.boardBuilder(any(), any())).thenAnswer((invocation) {
         final tiles = invocation.positionalArguments[1] as List<Widget>;
         return Row(children: tiles);
       });
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
       await tester.pumpAndSettle();
 
-      verify(() => layoutDelegate.tileBuilder(any(), any())).called(15);
+      verify(() => layoutDelegate.tileBuilder(any(), any(), false, 3)).called(15);
     });
 
     testWidgets(
         'builds 1 whitespace tile '
         'with layoutDelegate.whitespaceTileBuilder', (tester) async {
-      when(() => layoutDelegate.boardBuilder(any(), any()))
-          .thenAnswer((invocation) {
+      when(() => layoutDelegate.boardBuilder(any(), any())).thenAnswer((invocation) {
         final tiles = invocation.positionalArguments[1] as List<Widget>;
         return Row(children: tiles);
       });
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -224,8 +255,7 @@ void main() {
     testWidgets(
         'may start a timer '
         'in layoutDelegate', (tester) async {
-      when(() => layoutDelegate.startSectionBuilder(any()))
-          .thenAnswer((invocation) {
+      when(() => layoutDelegate.startSectionBuilder(any())).thenAnswer((invocation) {
         return Builder(
           builder: (context) {
             return TextButton(
@@ -238,7 +268,10 @@ void main() {
       });
 
       await tester.pumpApp(
-        PuzzleView(),
+        PuzzleView(
+          tiles: 4,
+          isImage: false,
+        ),
         themeBloc: themeBloc,
       );
 
@@ -271,7 +304,10 @@ void main() {
         when(() => timerBloc.state).thenReturn(timerState);
 
         await tester.pumpApp(
-          PuzzleBoard(),
+          PuzzleBoard(
+            tiles: 4,
+            isImage: false,
+          ),
           themeBloc: themeBloc,
           timerBloc: timerBloc,
           puzzleBloc: puzzleBloc,

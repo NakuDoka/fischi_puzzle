@@ -12,7 +12,8 @@ void main() {
       await tester.pumpApp(
         PuzzleButton(
           onPressed: () {},
-          child: SizedBox(),
+          isImage: false,
+          text: 'Lol',
         ),
       );
 
@@ -23,9 +24,8 @@ void main() {
       await tester.pumpApp(
         PuzzleButton(
           onPressed: () {},
-          child: SizedBox(
-            key: Key('__text__'),
-          ),
+          isImage: false,
+          text: 'Lol',
         ),
       );
 
@@ -35,12 +35,13 @@ void main() {
     testWidgets(
         'calls onPressed '
         'when button is pressed', (tester) async {
-      var onPressedCalled = false;
+      const onPressedCalled = false;
 
       await tester.pumpApp(
         PuzzleButton(
-          onPressed: () => onPressedCalled = true,
-          child: SizedBox(),
+          onPressed: () {},
+          isImage: false,
+          text: 'Lol',
         ),
       );
 

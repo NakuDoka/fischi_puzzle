@@ -11,7 +11,7 @@ class PuzzleTitle extends StatelessWidget {
   const PuzzleTitle({
     Key? key,
     required this.title,
-    this.color = PuzzleColors.primary1,
+    this.color = PuzzleColors.black,
   }) : super(key: key);
 
   /// The title to be displayed.
@@ -27,33 +27,17 @@ class PuzzleTitle extends StatelessWidget {
         child: SizedBox(
           width: 300,
           child: Center(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: PuzzleTextStyle.headline3.copyWith(
-                color: color,
-              ),
-            ),
+            child: Text('lol', textAlign: TextAlign.center, style: PuzzleTextStyle.bodyText),
           ),
         ),
       ),
       medium: (context, child) => Center(
-        child: Text(
-          title,
-          style: PuzzleTextStyle.headline3.copyWith(
-            color: color,
-          ),
-        ),
+        child: Text('lol', style: PuzzleTextStyle.bodyText),
       ),
-      large: (context, child) => SizedBox(
-        width: 300,
-        child: Text(
-          title,
-          style: PuzzleTextStyle.headline2.copyWith(
-            color: color,
-          ),
-        ),
+      large: (context, child) => Center(
+        child: Text('lol', style: PuzzleTextStyle.bodyText),
       ),
     );
   }
 }
+ // TODO check this

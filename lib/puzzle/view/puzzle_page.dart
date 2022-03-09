@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:very_good_slide_puzzle/colors/colors.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
 import 'package:very_good_slide_puzzle/models/models.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
+import 'package:very_good_slide_puzzle/services/provider.dart';
 import 'package:very_good_slide_puzzle/theme/theme.dart';
 import 'package:very_good_slide_puzzle/timer/timer.dart';
 
@@ -14,7 +17,9 @@ import 'package:very_good_slide_puzzle/timer/timer.dart';
 /// {@endtemplate}
 class PuzzlePage extends StatelessWidget {
   /// {@macro puzzle_page}
-  const PuzzlePage({Key? key}) : super(key: key);
+  const PuzzlePage({Key? key, required this.tiles, required this.isImage}) : super(key: key);
+  final int tiles;
+  final bool isImage;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,10 @@ class PuzzlePage extends StatelessWidget {
           SimpleTheme(),
         ],
       ),
-      child: const PuzzleView(),
+      child: PuzzleView(
+        tiles: tiles,
+        isImage: isImage,
+      ),
     );
   }
 }
@@ -34,7 +42,9 @@ class PuzzlePage extends StatelessWidget {
 /// {@endtemplate}
 class PuzzleView extends StatelessWidget {
   /// {@macro puzzle_view}
-  const PuzzleView({Key? key}) : super(key: key);
+  const PuzzleView({Key? key, required this.tiles, required this.isImage}) : super(key: key);
+  final int tiles;
+  final bool isImage;
 
   @override
   Widget build(BuildContext context) {
@@ -44,20 +54,24 @@ class PuzzleView extends StatelessWidget {
     final shufflePuzzle = theme is SimpleTheme;
 
     return Scaffold(
-      backgroundColor: theme.backgroundColor,
+      backgroundColor: PuzzleColors.white,
       body: BlocProvider(
         create: (context) => TimerBloc(
           ticker: const Ticker(),
         ),
         child: BlocProvider(
-          create: (context) => PuzzleBloc(4)
+          create: (context) => PuzzleBloc(
+            isImage && tiles == 5 ? 4 : tiles,
+          ) // Changes how many rows and columns
             ..add(
               PuzzleInitialized(
                 shufflePuzzle: shufflePuzzle,
               ),
             ),
-          child: const _Puzzle(
+          child: _Puzzle(
             key: Key('puzzle_view_puzzle'),
+            isImage: isImage,
+            tiles: tiles,
           ),
         ),
       ),
@@ -66,13 +80,14 @@ class PuzzleView extends StatelessWidget {
 }
 
 class _Puzzle extends StatelessWidget {
-  const _Puzzle({Key? key}) : super(key: key);
+  const _Puzzle({Key? key, required this.isImage, required this.tiles}) : super(key: key);
+  final bool isImage;
+  final int tiles;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.select((ThemeBloc bloc) => bloc.state.theme);
     final state = context.select((PuzzleBloc bloc) => bloc.state);
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
@@ -84,12 +99,26 @@ class _Puzzle extends StatelessWidget {
                   minHeight: constraints.maxHeight,
                 ),
                 child: Column(
-                  children: const [
-                    _PuzzleHeader(
-                      key: Key('puzzle_header'),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, left: 12),
+                      child: Row(
+                        children: [
+                          InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              size: 30,
+                              color: PuzzleColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     _PuzzleSections(
                       key: Key('puzzle_sections'),
+                      isImage: isImage,
+                      tiles: tiles,
                     ),
                   ],
                 ),
@@ -102,106 +131,46 @@ class _Puzzle extends StatelessWidget {
   }
 }
 
-class _PuzzleHeader extends StatelessWidget {
-  const _PuzzleHeader({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 96,
-      child: ResponsiveLayoutBuilder(
-        small: (context, child) => const Center(
-          child: _PuzzleLogo(),
-        ),
-        medium: (context, child) => Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 50,
-          ),
-          child: Row(
-            children: const [
-              _PuzzleLogo(),
-            ],
-          ),
-        ),
-        large: (context, child) => Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 50,
-          ),
-          child: Row(
-            children: const [
-              _PuzzleLogo(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PuzzleLogo extends StatelessWidget {
-  const _PuzzleLogo({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ResponsiveLayoutBuilder(
-      small: (context, child) => const SizedBox(
-        height: 24,
-        child: FlutterLogo(
-          style: FlutterLogoStyle.horizontal,
-          size: 86,
-        ),
-      ),
-      medium: (context, child) => const SizedBox(
-        height: 29,
-        child: FlutterLogo(
-          style: FlutterLogoStyle.horizontal,
-          size: 104,
-        ),
-      ),
-      large: (context, child) => const SizedBox(
-        height: 32,
-        child: FlutterLogo(
-          style: FlutterLogoStyle.horizontal,
-          size: 114,
-        ),
-      ),
-    );
-  }
-}
-
 class _PuzzleSections extends StatelessWidget {
-  const _PuzzleSections({Key? key}) : super(key: key);
+  const _PuzzleSections({Key? key, required this.isImage, required this.tiles}) : super(key: key);
+  final bool isImage;
+  final int tiles;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.select((ThemeBloc bloc) => bloc.state.theme);
     final state = context.select((PuzzleBloc bloc) => bloc.state);
+    final mode = isImage ? 'Img${tiles - 2}' : 'Num${tiles - 2}';
 
     return ResponsiveLayoutBuilder(
       small: (context, child) => Column(
         children: [
           theme.layoutDelegate.startSectionBuilder(state),
-          const PuzzleBoard(),
-          theme.layoutDelegate.endSectionBuilder(state),
+          PuzzleBoard(
+            isImage: isImage,
+            tiles: tiles,
+          ),
+          theme.layoutDelegate.endSectionBuilder(state, mode),
         ],
       ),
       medium: (context, child) => Column(
         children: [
           theme.layoutDelegate.startSectionBuilder(state),
-          const PuzzleBoard(),
-          theme.layoutDelegate.endSectionBuilder(state),
+          PuzzleBoard(
+            tiles: tiles,
+            isImage: isImage,
+          ),
+          theme.layoutDelegate.endSectionBuilder(state, mode),
         ],
       ),
-      large: (context, child) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      large: (context, child) => Column(
         children: [
-          Expanded(
-            child: theme.layoutDelegate.startSectionBuilder(state),
+          theme.layoutDelegate.startSectionBuilder(state),
+          PuzzleBoard(
+            isImage: isImage,
+            tiles: tiles,
           ),
-          const PuzzleBoard(),
-          Expanded(
-            child: theme.layoutDelegate.endSectionBuilder(state),
-          ),
+          theme.layoutDelegate.endSectionBuilder(state, mode),
         ],
       ),
     );
@@ -213,7 +182,9 @@ class _PuzzleSections extends StatelessWidget {
 /// {@endtemplate}
 class PuzzleBoard extends StatelessWidget {
   /// {@macro puzzle_board}
-  const PuzzleBoard({Key? key}) : super(key: key);
+  const PuzzleBoard({Key? key, required this.isImage, required this.tiles}) : super(key: key);
+  final bool isImage;
+  final int tiles;
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +207,8 @@ class PuzzleBoard extends StatelessWidget {
               (tile) => _PuzzleTile(
                 key: Key('puzzle_tile_${tile.value.toString()}'),
                 tile: tile,
+                isImage: isImage,
+                tiles: tiles,
               ),
             )
             .toList(),
@@ -245,21 +218,23 @@ class PuzzleBoard extends StatelessWidget {
 }
 
 class _PuzzleTile extends StatelessWidget {
-  const _PuzzleTile({
-    Key? key,
-    required this.tile,
-  }) : super(key: key);
+  const _PuzzleTile({Key? key, required this.tile, required this.isImage, required this.tiles}) : super(key: key);
 
   /// The tile to be displayed.
   final Tile tile;
+
+  ///
+  final bool isImage;
+
+  ///
+  final int tiles;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.select((ThemeBloc bloc) => bloc.state.theme);
     final state = context.select((PuzzleBloc bloc) => bloc.state);
-
     return tile.isWhitespace
         ? theme.layoutDelegate.whitespaceTileBuilder()
-        : theme.layoutDelegate.tileBuilder(tile, state);
+        : theme.layoutDelegate.tileBuilder(tile, state, isImage, tiles);
   }
 }
