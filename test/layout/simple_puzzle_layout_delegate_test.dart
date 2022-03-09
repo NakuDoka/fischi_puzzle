@@ -115,7 +115,7 @@ void main() {
 
         await tester.pumpApp(
           SingleChildScrollView(
-            child: layoutDelegate.endSectionBuilder(state),
+            child: layoutDelegate.endSectionBuilder(state, ''),
           ),
           themeBloc: themeBloc,
         );
@@ -131,7 +131,7 @@ void main() {
 
         await tester.pumpApp(
           SingleChildScrollView(
-            child: layoutDelegate.endSectionBuilder(state),
+            child: layoutDelegate.endSectionBuilder(state, ''),
           ),
           themeBloc: themeBloc,
         );
@@ -146,7 +146,7 @@ void main() {
 
         await tester.pumpApp(
           SingleChildScrollView(
-            child: layoutDelegate.endSectionBuilder(state),
+            child: layoutDelegate.endSectionBuilder(state, ''),
           ),
           themeBloc: themeBloc,
         );
@@ -294,7 +294,7 @@ void main() {
         tester.setLargeDisplaySize();
 
         await tester.pumpApp(
-          layoutDelegate.tileBuilder(tile, state),
+          layoutDelegate.tileBuilder(tile, state, false, 3),
           themeBloc: themeBloc,
         );
 
@@ -310,7 +310,7 @@ void main() {
         tester.setMediumDisplaySize();
 
         await tester.pumpApp(
-          layoutDelegate.tileBuilder(tile, state),
+          layoutDelegate.tileBuilder(tile, state, false, 3),
           themeBloc: themeBloc,
         );
 
@@ -326,7 +326,7 @@ void main() {
         tester.setSmallDisplaySize();
 
         await tester.pumpApp(
-          layoutDelegate.tileBuilder(tile, state),
+          layoutDelegate.tileBuilder(tile, state, false, 3),
           themeBloc: themeBloc,
         );
 

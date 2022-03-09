@@ -7,7 +7,7 @@ void main() {
 
   group('PuzzleTextStyle', () {
     test('headline styles are defined', () {
-      expect(PuzzleTextStyle.headLine1D, isA<TextStyle>());
+      expect(PuzzleTextStyle.headLine1W, isA<TextStyle>());
       expect(PuzzleTextStyle.headLine1W, isA<TextStyle>());
       expect(PuzzleTextStyle.headLine2D, isA<TextStyle>());
       expect(PuzzleTextStyle.headLine2W, isA<TextStyle>());
