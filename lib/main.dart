@@ -12,12 +12,6 @@ import 'package:very_good_slide_puzzle/bootstrap.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-      options: FirebaseOptions(
-    apiKey: "AIzaSyDCo2G3Jl8uRgC8x5X2OpyC_MQJfp4M0pY",
-    appId: "1:639154038312:web:a8f31333648e0ef3bcf71d",
-    messagingSenderId: "639154038312",
-    projectId: "fischi-puzzle",
-  ));
+
   runApp(App());
 }
